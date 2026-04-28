@@ -54,6 +54,29 @@ def show_success(message: str, *, title: str = "Completato") -> None:
     console.print(Panel(message, title=title, border_style="green", padding=(1, 2)))
 
 
+def show_export_tutorial() -> None:
+    """Show the exact export steps the user must follow in Meta."""
+
+    message = (
+        "1. Apri Centro gestione account.\n"
+        "2. Vai su Esporta le tue informazioni.\n"
+        "3. Intervallo di date: scegli Sempre.\n"
+        "4. Formato: scegli JSON.\n"
+        "5. Seleziona solo Follower e persone/Pagine seguite.\n"
+        "6. Conferma l'esportazione e scarica il file .zip o la cartella esportata.\n\n"
+        "Quando hai finito, trascina il file nel terminale oppure incolla qui il percorso completo."
+    )
+
+    console.print(
+        Panel(
+            message,
+            title="Come esportare i dati",
+            border_style="bright_yellow",
+            padding=(1, 2),
+        )
+    )
+
+
 def show_non_reciprocal_table(username: str, accounts: Sequence[str]) -> None:
     """Render the non-reciprocal accounts as a table."""
 
@@ -94,6 +117,32 @@ def prompt_username() -> str:
     return username
 
 
+def prompt_export_path() -> str:
+    """Ask the user for the export path and validate that it exists."""
+
+    while True:
+        export_path = Prompt.ask(
+            "Percorso all'export ufficiale Instagram (.zip, cartella estratta o .json)",
+            default="/Users/danilo/Downloads/instagram-export.zip",
+        ).strip()
+        if not export_path:
+            show_error("Devi inserire un percorso valido al file o alla cartella esportata.")
+            continue
+
+        return export_path
+
+
+def prompt_export_flow_choice() -> str:
+    """Ask whether the export is already available or still needs to be downloaded."""
+
+    choice = Prompt.ask(
+        "Hai già scaricato l'export ufficiale? (y/n)",
+        choices=["y", "n"],
+        default="y",
+    )
+    return choice
+
+
 def run(
     username: str,
     *,
@@ -129,9 +178,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     username = args.username or prompt_username()
-    export_path = args.export or Prompt.ask(
-        "Percorso all'export ufficiale Instagram (.zip, cartella estratta o .json)",
-    )
+
+    flow_choice = prompt_export_flow_choice() if args.export is None else "y"
+
+    if flow_choice == "n":
+        show_export_tutorial()
+    else:
+        show_info(
+            "Perfetto. Se hai già il file esportato, trascinalo nel terminale oppure incolla il percorso completo.\n\n"
+            "Esempio: /Users/danilo/Downloads/instagram-export.zip",
+            title="Carica l'export",
+            style="bright_blue",
+        )
+
+    export_path = args.export or prompt_export_path()
 
     show_info(
         "Per gli account privati questo strumento non usa API personali o scraping.\n"
@@ -140,7 +200,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         style="bright_blue",
     )
 
-    data = load_export_data(export_path)
+    while True:
+        try:
+            data = load_export_data(export_path)
+            break
+        except FileNotFoundError:
+            show_error(
+                "Non trovo quel percorso.\n\n"
+                "Incolla il percorso completo del file .zip, della cartella estratta o del file .json esportato da Meta.",
+                title="Percorso non valido",
+            )
+            export_path = prompt_export_path()
+        except ValueError as exc:
+            show_error(str(exc), title="Export non valido")
+            export_path = prompt_export_path()
+
     show_info(
         f"Dati caricati correttamente: {len(data.followers)} follower e {len(data.following)} following.",
         title="Import riuscito",

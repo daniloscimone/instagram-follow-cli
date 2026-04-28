@@ -1,26 +1,34 @@
 # Instagram Follow CLI
 
-CLI cross-platform per confrontare follower e following di Instagram usando solo l'export ufficiale Instagram, senza API personali e senza scraping.
+Uno strumento CLI semplice e pulito per confrontare i tuoi follower e following su Instagram, usando solo l'export ufficiale dei dati. **Niente API personali, niente scraping, niente automazioni.**
 
-## Open Source
+## 🎯 A cosa serve
 
-Questo repository è pensato per essere open source: chiunque può usarlo, modificarlo e proporre miglioramenti.
-La licenza del progetto è [MIT](LICENSE).
+Questo tool ti aiuta a scoprire **chi segui ma che non ti segue indietro** su Instagram. Funziona scaricando i tuoi dati ufficiali tramite Meta (il proprietario di Instagram) e confrontandoli localmente nel tuo computer, completamente offline.
 
-## Obiettivo
+### Caratteristiche
 
-- Chiedere interattivamente l'username.
-- Chiedere username o link all'account.
-- Caricare l'export ufficiale Instagram dell'utente.
-- Mostrare chi segue l'account ma non viene ricambiato.
+✅ Usa solo l'export ufficiale di Meta  
+✅ Nessuna credenziale personale richiesta  
+✅ Nessun scraping, nessuna automazione  
+✅ Completamente locale (offline dopo il download)  
+✅ Output colorato e facile da leggere  
+✅ Completamente open source  
 
-> Nota: questo progetto non usa API personali. Per gli account privati funziona tramite export ufficiale Instagram scaricato dopo login dell'utente.
+### Cosa non fa
 
-## Requisiti
+❌ Non usa le API di Instagram  
+❌ Non accede al tuo account con credenziali  
+❌ Non fa scraping web  
+❌ Non interagisce automaticamente con Instagram  
 
-- Python 3.10+
+## 📋 Requisiti
 
-## Installazione
+- Python 3.10 o superiore
+
+## 🚀 Installazione rapida
+
+### macOS e Linux
 
 ```bash
 python -m venv .venv
@@ -28,7 +36,7 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-Su Windows:
+### Windows
 
 ```bash
 python -m venv .venv
@@ -36,39 +44,106 @@ python -m venv .venv
 pip install -e .
 ```
 
-## Uso
+## 💻 Uso
+
+Il modo più semplice per iniziare è:
 
 ```bash
-instagram-follow-cli
+python3 main.py
 ```
 
-Il comando chiede lo username e il percorso dell'export ufficiale Instagram.
+Il programma ti guida passo dopo passo:
 
-Per avere subito un'esecuzione completa, puoi passare l'export così:
+1. **Username**: Inserisci il tuo nome utente Instagram
+2. **Export**: Scegli se hai già scaricato il file o se devi ancora farlo
+3. **Caricamento**: Trascina il file nel terminale oppure incolla il percorso
+4. **Risultati**: Visualizza la lista colorata degli account non ricambiati
+
+### Con opzioni
+
+Se preferisci saltare alcuni passaggi:
 
 ```bash
-instagram-follow-cli --username danilo --export ./instagram-export.zip
+python3 main.py --export /percorso/al/file.zip
 ```
 
-Puoi passare anche una cartella estratta oppure un file `.json` dell'export. Il tool cerca automaticamente follower e following dentro i contenuti scaricati da Instagram.
+## 📦 Come ottenere l'export da Instagram/Meta
 
-## Struttura
+### Passaggi esatti
 
-- `src/instagram_follow_cli/cli.py`: interfaccia CLI.
-- `src/instagram_follow_cli/instagram_export.py`: lettura dell'export ufficiale Instagram.
-- `src/instagram_follow_cli/instagram_api.py`: stub conservato solo per compatibilità futura.
-- `src/instagram_follow_cli/compare.py`: logica di confronto tra follower e following.
-- `pyproject.toml`: metadata, dipendenze e script console.
-- `LICENSE`: licenza open source MIT.
+1. Accedi a **Instagram.com** e vai alle **Impostazioni**
+2. Vai su **Il tuo account** → **Scarica i tuoi dati**
+3. Meta ti chiede il tipo di scaricamento:
+   - **Intervallo di date**: Seleziona `Sempre`
+   - **Formato**: Seleziona `JSON`
+   - **Voci**: Seleziona `Follower e persone/Pagine seguite`
+4. Scarica il file (di solito `.zip` o cartella)
+5. Usa il file con il programma
 
-## Aspetto del terminale
+### Formati supportati
 
-La CLI usa `rich` per un banner iniziale, pannelli colorati, prompt chiari e una tabella finale ordinata per gli account non ricambiati.
+- 📦 File `.zip` dell'export
+- 📁 Cartella estratta dell'export
+- 📄 File `followers_1.json` isolato
 
-## Sviluppo
+## 📊 Output
+
+Il programma ti mostra:
+
+- **Numero totale** di follower e following caricati
+- **Tabella ordinata** con gli account che segui ma non ti seguono indietro
+- **Nomi utente** pronti da copiare o verificare
+
+Esempio di output:
+
+```
+Account seguiti da @tuousername
+    che non seguono indietro
+
+┏━━━━━┳━━━━━━━━━━━━━━━━┓
+┃   # ┃ Username       ┃
+┡━━━━━╇━━━━━━━━━━━━━━━━┩
+│   1 │ account1       │
+│   2 │ account2       │
+│   3 │ account3       │
+└─────┴────────────────┘
+```
+
+## 📁 Struttura del progetto
+
+```
+instagram-follow-cli/
+├── main.py                              # Punto di avvio
+├── src/instagram_follow_cli/
+│   ├── __init__.py
+│   ├── cli.py                          # Interfaccia CLI
+│   ├── instagram_export.py              # Parser export
+│   └── compare.py                       # Logica comparazione
+├── tests/                               # Test automatici
+├── pyproject.toml                       # Configurazione Python
+├── LICENSE                              # MIT License
+└── README.md                            # Questo file
+```
+
+## 🔧 Sviluppo
+
+Se vuoi modificare il codice:
 
 ```bash
-python -m pip install -e .
-instagram-follow-cli
+pip install -e .
+python3 main.py
+python -m unittest discover -s tests
 ```
+
+## 📄 Licenza
+
+Progetto distribuito sotto licenza **MIT**. Libero da usare, modificare e distribuire.
+
+## 🤝 Contribuzioni
+
+Segnalazioni di bug, suggerimenti e pull request sono benvenuti! Questo è un progetto open source pensato per la comunità.
+
+## ⚠️ Disclaimer
+
+Questo tool opera **esclusivamente** sui dati che esporti tu stesso da Meta. Non fa alcun accesso a Instagram per tuo conto e non memorizza dati. Usa le API ufficiali di Meta solo per il download iniziale del file.
 

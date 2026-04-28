@@ -28,10 +28,35 @@ def _extract_usernames_from_json(payload: Any) -> list[str]:
 
     if isinstance(payload, list):
         for item in payload:
+            if isinstance(item, dict) and "string_list_data" in item:
+                string_list = item.get("string_list_data", [])
+                if isinstance(string_list, list):
+                    for entry in string_list:
+                        if isinstance(entry, dict):
+                            value = entry.get("value")
+                            if isinstance(value, str) and value.strip():
+                                usernames.append(value.strip())
+            if isinstance(item, dict) and "title" in item:
+                title = item.get("title")
+                if isinstance(title, str) and title.strip():
+                    usernames.append(title.strip())
             usernames.extend(_extract_usernames_from_json(item))
         return usernames
 
     if isinstance(payload, dict):
+        if isinstance(payload.get("relationships_following"), list):
+            for entry in payload["relationships_following"]:
+                if isinstance(entry, dict):
+                    title = entry.get("title")
+                    if isinstance(title, str) and title.strip():
+                        usernames.append(title.strip())
+        if isinstance(payload.get("relationships_followers"), list):
+            for entry in payload["relationships_followers"]:
+                if isinstance(entry, dict):
+                    title = entry.get("title")
+                    if isinstance(title, str) and title.strip():
+                        usernames.append(title.strip())
+
         if isinstance(payload.get("username"), str):
             usernames.append(payload["username"])
 
